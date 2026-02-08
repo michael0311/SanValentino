@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover" />
   <title>💘 Operazione San Valentino</title>
   <meta name="theme-color" content="#ff4d6d" />
   <style>
@@ -12,6 +12,9 @@
       --shadow: 0 20px 60px rgba(0,0,0,.12);
     }
     *{box-sizing:border-box}
+
+    /* ✅ Mobile-friendly: no "jump" + safe-area */
+    html{ height:100%; }
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -19,20 +22,27 @@
       background: radial-gradient(1000px 600px at 20% 10%, var(--bg2), transparent),
                   radial-gradient(900px 500px at 80% 20%, #fff, transparent),
                   linear-gradient(180deg, var(--bg1), #fff);
-      min-height:100vh;
+      min-height:100svh; /* ✅ better on mobile than 100vh */
       display:grid;
       place-items:center;
-      overflow:hidden;
+      overflow-x:hidden;
+      padding:
+        max(12px, env(safe-area-inset-top))
+        max(12px, env(safe-area-inset-right))
+        max(12px, env(safe-area-inset-bottom))
+        max(12px, env(safe-area-inset-left));
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .wrap{ width:min(820px, 94vw); padding:24px; }
+    /* ✅ Mobile-friendly sizing */
+    .wrap{ width:min(820px, 100%); padding: clamp(10px, 3vw, 24px); }
     .card{
       background:var(--card);
       backdrop-filter: blur(10px);
       border:1px solid rgba(255,77,109,.18);
-      border-radius:30px;
+      border-radius: clamp(18px, 4vw, 30px);
       box-shadow: var(--shadow);
-      padding:26px 22px;
+      padding: clamp(16px, 4vw, 26px) clamp(14px, 4vw, 22px);
       position:relative;
       overflow:hidden;
     }
@@ -40,12 +50,13 @@
       position:absolute; top:-45px; right:-65px; width:210px; height:210px;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       transform: rotate(25deg); opacity:.20; border-radius:44px;
+      pointer-events:none;
     }
-    h1{ margin:0 0 10px; font-size: clamp(28px, 4vw, 46px); letter-spacing:-.02em; }
-    p{ margin:0; line-height:1.55; font-size: clamp(16px, 2.1vw, 18px); opacity:.92; }
+    h1{ margin:0 0 10px; font-size: clamp(24px, 5.2vw, 46px); letter-spacing:-.02em; }
+    p{ margin:0; line-height:1.55; font-size: clamp(15px, 4vw, 18px); opacity:.92; }
 
     .name{ color:var(--accent); font-weight:950; }
-    .row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:14px; }
+    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:14px; }
 
     .chip{
       display:inline-flex; gap:8px; align-items:center;
@@ -56,10 +67,14 @@
 
     .btns{ margin-top:18px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
     button{
-      border:0; border-radius:999px; padding:14px 18px;
-      font-size:16px; font-weight:900; cursor:pointer;
+      border:0; border-radius:999px;
+      padding: 14px 18px;
+      font-size:16px; font-weight:900;
+      cursor:pointer;
       transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
       box-shadow: 0 10px 25px rgba(255,77,109,.18);
+      touch-action: manipulation; /* ✅ reduce delay on mobile */
+      min-height: 46px; /* ✅ big tap target */
     }
     .primary{
       background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -72,6 +87,12 @@
     }
     .ghost:hover{ transform: translateY(-1px); }
 
+    /* ✅ Mobile-friendly: stack buttons on small screens */
+    @media (max-width: 420px){
+      .btns{ flex-direction:column; align-items:stretch; }
+      .btns button{ width:100%; }
+    }
+
     /* Foto in alto */
     .photoWrap{
       margin: 6px 0 14px;
@@ -80,7 +101,7 @@
       border:1px solid rgba(255,77,109,.18);
       background: rgba(255,255,255,.7);
       box-shadow: 0 16px 40px rgba(0,0,0,.10);
-      height: min(260px, 32vh);
+      height: min(240px, 28svh); /* ✅ nicer on mobile */
       position:relative;
     }
     .photoWrap img{
@@ -104,7 +125,7 @@
     /* Game arena */
     .arena{
       margin-top:18px;
-      height: min(430px, 55vh);
+      height: min(430px, 56svh); /* ✅ stable on mobile */
       border-radius:24px;
       border:1px solid rgba(255,77,109,.18);
       background:
@@ -115,6 +136,7 @@
       overflow:hidden;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.5);
       display:none;
+      touch-action: none; /* ✅ avoid scroll while playing */
     }
     .arena.show{ display:block; }
 
@@ -126,6 +148,8 @@
       filter: drop-shadow(0 10px 12px rgba(0,0,0,.12));
       transform: translate(-50%, -50%);
       animation: floaty 2.4s ease-in-out infinite;
+      -webkit-user-select:none;
+      -webkit-touch-callout:none;
     }
     @keyframes floaty{
       0%,100%{ transform: translate(-50%,-50%) translateY(0); }
@@ -150,7 +174,7 @@
     /* Bubble del NO (posizionata via JS) */
     .bubble{
       position:fixed;
-      max-width: 290px;
+      max-width: min(290px, calc(100vw - 24px)); /* ✅ fits on mobile */
       padding:10px 12px;
       border-radius:16px;
       background: rgba(255,255,255,.92);
@@ -208,6 +232,11 @@
     }
 
     .tiny{ font-size: 12px; opacity:.75; margin-top:10px; }
+
+    /* ✅ Mobile-friendly: hearts click also on touch */
+    @media (hover: none){
+      .primary:hover, .ghost:hover { transform: none; }
+    }
   </style>
 </head>
 <body>
@@ -229,6 +258,7 @@
             Metti un’immagine chiamata <b>stitch.jpg</b> nella stessa cartella di <b>index.html</b>.
           </div>
         </div>
+
         <h1>Per <span class="name" id="herName"> Giorgia </span> 💘</h1>
         <p>
           <b>Operazione San Valentino</b> è iniziata 😌<br/>
@@ -352,7 +382,7 @@
     el.className = "heart";
     el.textContent = heartChars[Math.floor(Math.random()*heartChars.length)];
 
-    const size = rand(22, 46);
+    const size = rand(24, 54); // ✅ slightly bigger for mobile taps
     el.style.fontSize = size + "px";
 
     const x0 = rand(8, 92);
@@ -379,7 +409,9 @@
     }
     requestAnimationFrame(step);
 
-    el.addEventListener("click", (e) => {
+    // ✅ Touch-friendly: pointer events (works on Android/iOS/desktop)
+    el.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
       e.stopPropagation();
       if(!running) return;
 
@@ -398,7 +430,7 @@
       el.remove();
 
       if(caught >= GOAL) win();
-    });
+    }, { passive:false });
 
     arena.appendChild(el);
   }
@@ -469,7 +501,7 @@
     const tease = [
       "Plot twist: i cuori erano più veloci del previsto 😄",
       "Ok, la missione era leggermente truccata. (Forse.) 😇"
-    ][Math.floor(rand(0,3))];
+    ][Math.floor(rand(0,2))];
 
     setResult(`⏳ Tempo finito!<br/>Hai preso <b>${caught}</b> cuori su <b>${GOAL}</b>.<br/><i>${tease}</i>`);
 
@@ -549,7 +581,6 @@
   function moveNo(){
     const pad = 14;
 
-    // stacca dal layout in modo sicuro
     noBtn.style.position = "fixed";
     noBtn.style.zIndex = "9999";
 
@@ -567,11 +598,14 @@
   }
 
   let noCount = 0;
-  noBtn.addEventListener("mouseenter", () => {
+
+  // ✅ Mobile-friendly: use pointer events instead of mouseenter only
+  noBtn.addEventListener("pointerenter", () => {
     noCount++;
     if(noCount <= 6) moveNo();
   });
-  noBtn.addEventListener("click", (e) => {
+
+  noBtn.addEventListener("pointerdown", (e) => {
     e.preventDefault();
     noCount++;
     if(noCount <= 10) moveNo();
@@ -586,7 +620,7 @@
       noBtn.onclick = null;
       noBtn.addEventListener("click", () => yesBtn.click(), { once:true });
     }
-  });
+  }, { passive:false });
 
   window.addEventListener("resize", () => {
     if (bubble.classList.contains("show")) placeBubbleNearButton();
