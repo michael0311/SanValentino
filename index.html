@@ -13,223 +13,655 @@
     }
     *{box-sizing:border-box}
 
+    html{ height:100%; }
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
       color:var(--text);
-      background: linear-gradient(180deg, var(--bg1), #fff);
+      background: radial-gradient(1000px 600px at 20% 10%, var(--bg2), transparent),
+                  radial-gradient(900px 500px at 80% 20%, #fff, transparent),
+                  linear-gradient(180deg, var(--bg1), #fff);
       min-height:100svh;
+      display:grid;
+      place-items:center;
+      /* ✅ IMPORTANTISSIMO: su mobile serve scroll */
+      overflow-x:hidden;
       overflow-y:auto;
-      padding:12px;
       -webkit-tap-highlight-color: transparent;
+      padding: 12px;
     }
 
-    .wrap{ width:min(820px, 100%); margin:auto; }
+    .wrap{ width:min(820px, 100%); padding: 0; }
     .card{
       background:var(--card);
-      border-radius:26px;
+      backdrop-filter: blur(10px);
+      border:1px solid rgba(255,77,109,.18);
+      border-radius:30px;
       box-shadow: var(--shadow);
-      padding:18px 16px;
+      padding:26px 22px;
       position:relative;
-    }
-
-    h1{ font-size:24px; margin:0 0 8px; }
-    p{ font-size:14px; margin:0; line-height:1.5 }
-
-    .name{ color:var(--accent); font-weight:900; }
-
-    .photoWrap{
-      height:150px;
-      border-radius:18px;
       overflow:hidden;
-      margin-bottom:12px;
     }
-    .photoWrap img{ width:100%; height:100%; object-fit:cover; }
+    .ribbon{
+      position:absolute; top:-45px; right:-65px; width:210px; height:210px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      transform: rotate(25deg); opacity:.20; border-radius:44px;
+      pointer-events:none;
+    }
+    h1{ margin:0 0 10px; font-size: clamp(24px, 4.2vw, 46px); letter-spacing:-.02em; }
+    p{ margin:0; line-height:1.55; font-size: clamp(14px, 2.1vw, 18px); opacity:.92; }
 
-    .btns{ display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+    .name{ color:var(--accent); font-weight:950; }
+    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:14px; }
+
+    .chip{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:9px 12px; border-radius:999px;
+      border:1px solid rgba(255,77,109,.25); background: rgba(255,255,255,.75);
+      font-size: 13px; opacity:.92;
+    }
+
+    .btns{ margin-top:18px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
     button{
-      border:0;
-      border-radius:999px;
-      padding:12px;
-      font-size:15px;
-      font-weight:900;
-      min-height:44px;
-      touch-action:manipulation;
+      border:0; border-radius:999px; padding:14px 18px;
+      font-size:16px; font-weight:900; cursor:pointer;
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
+      box-shadow: 0 10px 25px rgba(255,77,109,.18);
+      touch-action: manipulation;
+      min-height:46px;
     }
-    .primary{ background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
-    .ghost{ background:#fff; border:1px solid #ddd; }
+    .primary{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color:#fff;
+    }
+    .primary:hover{ transform: translateY(-1px) scale(1.01); }
+    .ghost{
+      background:#fff; color:#444; border:1px solid rgba(0,0,0,.08);
+      box-shadow: 0 10px 25px rgba(0,0,0,.06);
+    }
+    .ghost:hover{ transform: translateY(-1px); }
 
-    .arena{
-      height:52svh;
-      margin-top:12px;
-      border-radius:20px;
-      background:#fff6f9;
+    /* Foto in alto */
+    .photoWrap{
+      margin: 6px 0 14px;
+      border-radius: 22px;
+      overflow:hidden;
+      border:1px solid rgba(255,77,109,.18);
+      background: rgba(255,255,255,.7);
+      box-shadow: 0 16px 40px rgba(0,0,0,.10);
+      height: min(260px, 32svh);
+      position:relative;
+    }
+    .photoWrap img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .photoHint{
+      position:absolute;
+      inset:auto 10px 10px 10px;
+      padding:10px 12px;
+      border-radius:16px;
+      background: rgba(255,255,255,.86);
+      border:1px solid rgba(255,77,109,.22);
+      font-size:12px;
+      line-height:1.35;
       display:none;
+    }
+
+    /* Game arena */
+    .arena{
+      margin-top:18px;
+      height: min(430px, 55svh);
+      border-radius:24px;
+      border:1px solid rgba(255,77,109,.18);
+      background:
+        radial-gradient(520px 220px at 20% 10%, rgba(255,77,109,.12), transparent),
+        radial-gradient(480px 220px at 80% 40%, rgba(255,143,171,.14), transparent),
+        rgba(255,255,255,.6);
       position:relative;
       overflow:hidden;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.5);
+      display:none;
+      touch-action: none;
     }
     .arena.show{ display:block; }
 
     .heart{
       position:absolute;
-      transform:translate(-50%,-50%);
+      user-select:none;
       cursor:pointer;
+      will-change: transform, top, left;
+      filter: drop-shadow(0 10px 12px rgba(0,0,0,.12));
+      transform: translate(-50%, -50%);
       animation: floaty 2.4s ease-in-out infinite;
+      -webkit-user-select:none;
+      -webkit-touch-callout:none;
     }
     @keyframes floaty{
       0%,100%{ transform: translate(-50%,-50%) translateY(0); }
       50%{ transform: translate(-50%,-50%) translateY(-10px); }
     }
 
-    .final{ display:none; margin-top:12px; }
+    .toast{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:18px;
+      background: rgba(255,255,255,.78);
+      border:1px solid rgba(255,77,109,.2);
+      display:none;
+    }
+    .toast.show{ display:block; }
+    .big{ font-size: clamp(16px, 2.5vw, 22px); font-weight:950; }
+
+    .final{ display:none; margin-top:14px; }
     .final.show{ display:block; }
 
     .bubble{
       position:fixed;
-      max-width:280px;
-      padding:10px;
+      max-width: min(290px, calc(100vw - 24px));
+      padding:10px 12px;
       border-radius:16px;
-      background:white;
-      border:1px solid #ffd1dc;
-      font-size:12px;
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(255,77,109,.22);
+      font-size: 12px;
+      line-height:1.35;
+      box-shadow: 0 12px 25px rgba(0,0,0,.08);
       opacity:0;
       pointer-events:none;
-      z-index:9998;
-      transform:translate(-50%,-100%);
+      transition: opacity .15s ease, transform .15s ease;
+      white-space: normal;
+      z-index: 9998;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -100%);
     }
-    .bubble.show{ opacity:1; }
+    .bubble:after{
+      content:"";
+      position:absolute;
+      left:50%;
+      transform: translateX(-50%);
+      top:100%;
+      width:0; height:0;
+      border:10px solid transparent;
+      border-top-color: rgba(255,255,255,.92);
+      filter: drop-shadow(0 2px 0 rgba(255,77,109,.15));
+    }
+    .bubble.show{
+      opacity:1;
+      transform: translate(-50%, calc(-100% - 2px));
+    }
+
+    .spark{
+      position:absolute; inset:auto 0 0 0; height:170px;
+      background: radial-gradient(closest-side, rgba(255,77,109,.18), transparent);
+      transform: translateY(70px);
+      pointer-events:none;
+    }
+
+    .confetti{
+      position:fixed; inset:0; pointer-events:none; overflow:hidden;
+      display:none; z-index: 9997;
+    }
+    .confetti.show{ display:block; }
+    .piece{
+      position:absolute; top:-10px;
+      width:10px; height:14px; border-radius:4px;
+      opacity:.9;
+      animation: fall linear forwards;
+    }
+    @keyframes fall{
+      to{ transform: translateY(110vh) rotate(720deg); opacity:1; }
+    }
+
+    .tiny{ font-size: 12px; opacity:.75; margin-top:10px; }
+
+    /* ✅ MOBILE: tutto più compatto + bottoni sempre visibili */
+    @media (max-width: 460px){
+      body{ place-items: start center; padding: 10px; }
+      .card{
+        border-radius: 22px;
+        padding: 16px 14px;
+      }
+      .ribbon{ opacity:.12; width:160px; height:160px; top:-55px; right:-75px; }
+      .photoWrap{ height: 150px; margin: 4px 0 10px; border-radius:18px; }
+      h1{ font-size: 24px; margin-bottom: 8px; }
+      p{ font-size: 14px; }
+      .row{ gap:8px; margin-top:10px; }
+      .chip{ font-size:12px; padding:7px 10px; }
+      .btns{
+        margin-top: 12px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      button{
+        width:100%;
+        font-size:15px;
+        padding:12px 14px;
+        min-height:44px;
+      }
+      .arena{ height: 52svh; margin-top: 12px; }
+      .toast{ margin-top: 10px; padding: 10px 12px; }
+    }
+
+    @media (hover: none){
+      .primary:hover, .ghost:hover { transform: none; }
+    }
   </style>
 </head>
 <body>
+  <div class="confetti" id="confetti"></div>
+  <div class="bubble" id="bubble">mi dispiace non è un opzione valida eh eh eh</div>
 
-<div class="bubble" id="bubble">mi dispiace non è un opzione valida eh eh eh</div>
+  <main class="wrap">
+    <section class="card" aria-live="polite">
+      <div class="ribbon"></div>
 
-<main class="wrap">
-  <section class="card">
+      <div id="screenIntro">
+        <div class="photoWrap">
+          <img id="stitchImg" src="stitch.jpg" alt="Stitch innamorato">
+          <div class="photoHint" id="photoHint">
+            Non trovo <b>stitch.jpg</b> 😅<br/>
+            Metti un’immagine chiamata <b>stitch.jpg</b> nella stessa cartella di <b>index.html</b>.
+          </div>
+        </div>
 
-    <div id="screenIntro">
-      <div class="photoWrap">
-        <img src="stitch.jpg" alt="Stitch">
+        <h1>Per <span class="name" id="herName"> Giorgia </span> 💘</h1>
+        <p>
+          <b>Operazione San Valentino</b> è iniziata 😌<br/>
+          Obiettivo: raccogliere <b><span id="goalN">7</span> cuori</b> cliccando quelli che svolazzano.<br/>
+          Se completi la missione, sblocchi una domanda segreta…
+        </p>
+
+        <div class="row">
+          <span class="chip">⏱️ Timer: <b><span id="timeLimit">25</span>s</b></span>
+          <span class="chip">🎯 Cuori: <b><span id="goalChip">7</span></b></span>
+          <span class="chip">🧠 Vai d’istinto</span>
+        </div>
+
+        <div class="btns">
+          <button class="primary" id="startBtn">Ok Stitch, vai 💞</button>
+          <button class="ghost" id="demoBtn">Fammi vedere 5s</button>
+        </div>
+
+        <div class="tiny">P.S. Se perdi, non vale. Cioè vale, ma io faccio finta di niente 😇</div>
       </div>
 
-      <h1>Per <span class="name" id="herName">Giorgia</span> 💘</h1>
-      <p>Raccogli i cuori per sbloccare una domanda segreta 😌</p>
+      <div class="arena" id="arena"></div>
 
-      <div class="btns">
-        <button class="primary" id="startBtn">Inizia 💞</button>
-        <button class="ghost" id="demoBtn">Demo 5s</button>
+      <div class="toast" id="hud">
+        <div class="row" style="margin-top:0">
+          <span class="chip">💗 Presi: <b><span id="caught">0</span>/<span id="goal">7</span></b></span>
+          <span class="chip">⏳ Tempo: <b><span id="timeLeft">25</span>s</b></span>
+          <span class="chip">✨ Combo: <b><span id="combo">x1</span></b></span>
+        </div>
       </div>
-    </div>
 
-    <div class="arena" id="arena"></div>
+      <div class="toast" id="result"></div>
 
-    <div class="final" id="final">
-      <p><b>Giorgia</b>, vuoi essere il mio <b>San Valentino</b>? 🌹</p>
-      <div class="btns" id="finalBtns">
-        <button class="primary" id="yesBtn">Sììì! 💖</button>
-        <button class="ghost" id="noBtn">No 😅</button>
+      <div class="final" id="final">
+        <p class="big">Missione completata! <i>Sei troppo brava</i> 🥹✨</p>
+        <p style="margin-top:6px">
+          Ok, momento serissimo (per 2 secondi)…<br/>
+          <b>Giorgia</b>, vuoi essere il mio <b>San Valentino</b> quest’anno? 🌹
+        </p>
+        <div class="btns" id="finalBtns">
+          <button class="primary" id="yesBtn">Sììì! 💖</button>
+          <button class="ghost" id="noBtn">No 😅</button>
+        </div>
+        <div class="toast" id="loveMsg" style="margin-top:12px"></div>
       </div>
-      <div id="loveMsg"></div>
-    </div>
 
-  </section>
-</main>
+      <div class="spark"></div>
+    </section>
+  </main>
 
 <script>
-const herNick="Stitch";
-document.getElementById("herName").textContent=herNick;
+  const herRealName = "Giorgia";
+  const herNick = "Stitch";
+  const from = "Michael";
 
-const arena=document.getElementById("arena");
-const final=document.getElementById("final");
-const startBtn=document.getElementById("startBtn");
-const demoBtn=document.getElementById("demoBtn");
-const heartChars=["💗","💖","💘","💕"];
+  const PHOTO_SRC = "stitch.jpg";
+  const stitchImg = document.getElementById("stitchImg");
+  const photoHint = document.getElementById("photoHint");
+  stitchImg.src = PHOTO_SRC;
+  stitchImg.addEventListener("error", () => {
+    stitchImg.style.display = "none";
+    photoHint.style.display = "block";
+  });
 
-function rand(a,b){return Math.random()*(b-a)+a}
+  const params = new URLSearchParams(location.search);
+  const GOAL = Math.max(3, Math.min(20, parseInt(params.get("goal") || "7", 10)));
+  const LIMIT = Math.max(10, Math.min(60, parseInt(params.get("time") || "25", 10)));
 
-function spawnHeart(){
-  const el=document.createElement("div");
-  el.className="heart";
-  el.textContent=heartChars[Math.floor(Math.random()*heartChars.length)];
-  el.style.left=rand(10,90)+"%";
-  el.style.top=rand(20,90)+"%";
-  el.style.fontSize=rand(26,54)+"px";
-  el.addEventListener("pointerdown",()=>el.remove());
-  arena.appendChild(el);
-}
+  document.getElementById("herName").textContent = herNick;
+  document.getElementById("goal").textContent = GOAL;
+  document.getElementById("goalN").textContent = GOAL;
+  document.getElementById("goalChip").textContent = GOAL;
+  document.getElementById("timeLimit").textContent = LIMIT;
+  document.getElementById("timeLeft").textContent = LIMIT;
 
-function startGame(t){
-  arena.classList.add("show");
-  document.getElementById("screenIntro").style.display="none";
-  setTimeout(()=>{ arena.classList.remove("show"); final.classList.add("show"); },t*1000);
-  let i=setInterval(spawnHeart,300);
-  setTimeout(()=>clearInterval(i),t*1000);
-}
-startBtn.onclick=()=>startGame(20);
-demoBtn.onclick=()=>startGame(5);
+  const arena = document.getElementById("arena");
+  const hud = document.getElementById("hud");
+  const result = document.getElementById("result");
+  const final = document.getElementById("final");
+  const startBtn = document.getElementById("startBtn");
+  const demoBtn = document.getElementById("demoBtn");
 
-const yesBtn=document.getElementById("yesBtn");
-const noBtn=document.getElementById("noBtn");
-const bubble=document.getElementById("bubble");
+  const caughtEl = document.getElementById("caught");
+  const timeLeftEl = document.getElementById("timeLeft");
+  const comboEl = document.getElementById("combo");
 
-yesBtn.onclick=()=>{
-  document.getElementById("loveMsg").innerHTML="Allora preparo le candele 💘";
-  document.getElementById("finalBtns").style.display="none";
-};
+  const introScreen = document.getElementById("screenIntro");
+  const confetti = document.getElementById("confetti");
 
-/* ================= FIX ANDROID ================= */
+  const heartChars = ["💗","💖","💘","💕","💞","💓","❤️‍🔥"];
 
-let suppressClicksUntil=0;
-document.addEventListener("click",(e)=>{
-  if(Date.now()<suppressClicksUntil){
-    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-  }
-},true);
+  let running = false, caught = 0, timeLeft = LIMIT;
+  let timer = null, spawner = null;
+  let combo = 1, lastCatchTs = 0;
 
-function armSuppress(ms=350){ suppressClicksUntil=Date.now()+ms; }
+  function rand(min, max){ return Math.random()*(max-min)+min; }
 
-function showBubble(){
-  const r=noBtn.getBoundingClientRect();
-  bubble.style.left=(r.left+r.width/2)+"px";
-  bubble.style.top=(r.top-10)+"px";
-  bubble.classList.add("show");
-  setTimeout(()=>bubble.classList.remove("show"),1000);
-}
-
-function moveNo(){
-  const x=Math.random()*(window.innerWidth-120);
-  const y=Math.random()*(window.innerHeight-60);
-  noBtn.style.position="fixed";
-  noBtn.style.left=x+"px";
-  noBtn.style.top=y+"px";
-  showBubble();
-}
-
-let noCount=0;
-
-noBtn.addEventListener("pointerdown",(e)=>{
-  e.preventDefault(); e.stopPropagation();
-  try{ noBtn.setPointerCapture(e.pointerId);}catch{}
-  noCount++;
-
-  if(noCount<=10){
-    armSuppress(400);
-    moveNo();
-    return;
+  function popSound(){
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = "sine";
+    o.frequency.value = 520 + Math.random()*120;
+    g.gain.value = 0.0001;
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.01);
+    o.frequency.exponentialRampToValueAtTime(860 + Math.random()*120, ctx.currentTime + 0.06);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+    o.stop(ctx.currentTime + 0.13);
+    setTimeout(()=>ctx.close(), 180);
   }
 
-  noBtn.textContent="Ok ok… Sì 💗";
-  noBtn.classList.remove("ghost");
-  noBtn.classList.add("primary");
-  noBtn.style.position="static";
-  armSuppress(400);
+  function spawnHeart(){
+    if(!running) return;
+    const el = document.createElement("div");
+    el.className = "heart";
+    el.textContent = heartChars[Math.floor(Math.random()*heartChars.length)];
 
-  noBtn.addEventListener("click",(ev)=>{
-    ev.preventDefault(); ev.stopPropagation();
-    yesBtn.click();
-  },{once:true});
+    const size = rand(26, 56); // tap più facile su mobile
+    el.style.fontSize = size + "px";
 
-},{passive:false});
+    const x0 = rand(8, 92);
+    const y0 = rand(86, 98);
+    el.style.left = x0 + "%";
+    el.style.top = y0 + "%";
+
+    const dx = rand(-18, 18);
+    const dy = rand(70, 95);
+    const dur = rand(1200, 2200);
+
+    const start = performance.now();
+    function step(now){
+      const t = Math.min(1, (now - start)/dur);
+      el.style.left = (x0 + dx * t) + "%";
+      el.style.top  = (y0 - dy * t) + "%";
+      if(t < 1 && el.isConnected) requestAnimationFrame(step);
+      else el.remove();
+    }
+    requestAnimationFrame(step);
+
+    el.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if(!running) return;
+
+      const now = Date.now();
+      if(now - lastCatchTs < 700) combo = Math.min(5, combo + 1);
+      else combo = 1;
+      lastCatchTs = now;
+
+      caught += combo;
+      caught = Math.min(GOAL, caught);
+
+      caughtEl.textContent = caught;
+      comboEl.textContent = "x" + combo;
+
+      popSound();
+      el.remove();
+
+      if(caught >= GOAL) win();
+    }, { passive:false });
+
+    arena.appendChild(el);
+  }
+
+  function clearArena(){
+    [...arena.querySelectorAll(".heart")].forEach(x => x.remove());
+  }
+
+  function setResult(html){
+    result.innerHTML = html;
+    result.classList.add("show");
+  }
+
+  function startGame(seconds){
+    running = true;
+    caught = 0;
+    combo = 1;
+    lastCatchTs = 0;
+    timeLeft = seconds;
+
+    caughtEl.textContent = "0";
+    timeLeftEl.textContent = timeLeft;
+    comboEl.textContent = "x1";
+
+    result.classList.remove("show");
+    final.classList.remove("show");
+    clearArena();
+
+    introScreen.style.display = "none";
+    arena.classList.add("show");
+    hud.classList.add("show");
+
+    if(timer) clearInterval(timer);
+    timer = setInterval(() => {
+      if(!running) return;
+      timeLeft--;
+      timeLeftEl.textContent = timeLeft;
+      if(timeLeft <= 0) lose();
+    }, 1000);
+
+    if(spawner) clearInterval(spawner);
+    spawner = setInterval(() => {
+      const n = timeLeft < Math.ceil(seconds*0.5) ? 2 : 1;
+      for(let i=0;i<n;i++) spawnHeart();
+    }, 320);
+
+    for(let i=0;i<6;i++) setTimeout(spawnHeart, i*120);
+  }
+
+  function stopGame(){
+    running = false;
+    if(timer) clearInterval(timer);
+    if(spawner) clearInterval(spawner);
+    clearArena();
+  }
+
+  function win(){
+    stopGame();
+    setResult(`✅ <b>Ok Stitch, missione completata.</b><br/>Adesso si sblocca la domanda segreta… (respira) 💌`);
+    setTimeout(() => {
+      result.classList.remove("show");
+      final.classList.add("show");
+    }, 700);
+  }
+
+  function lose(){
+    stopGame();
+    const tease = [
+      "Plot twist: i cuori erano più veloci del previsto 😄",
+      "Ok, la missione era leggermente truccata. (Forse.) 😇"
+    ][Math.floor(rand(0,2))];
+
+    setResult(`⏳ Tempo finito!<br/>Hai preso <b>${caught}</b> cuori su <b>${GOAL}</b>.<br/><i>${tease}</i>`);
+
+    const retry = document.createElement("div");
+    retry.className = "btns";
+    retry.style.marginTop = "12px";
+    retry.innerHTML = `
+      <button class="primary" id="retryBtn">Riprova 💞</button>
+      <button class="ghost" id="easierBtn">Ok ma più facile 😌</button>
+    `;
+    result.appendChild(retry);
+
+    document.getElementById("retryBtn").onclick = () => startGame(LIMIT);
+    document.getElementById("easierBtn").onclick = () => startGame(Math.min(60, LIMIT + 10));
+  }
+
+  function doConfetti(){
+    confetti.innerHTML = "";
+    confetti.classList.add("show");
+    const pieces = 95;
+    for(let i=0;i<pieces;i++){
+      const p = document.createElement("div");
+      p.className = "piece";
+      p.style.left = rand(0, 100) + "vw";
+      p.style.animationDuration = rand(1600, 2800) + "ms";
+      p.style.animationDelay = rand(0, 450) + "ms";
+      p.style.background = `hsl(${Math.floor(rand(330, 390))}deg, 90%, ${Math.floor(rand(55,70))}%)`;
+      confetti.appendChild(p);
+    }
+    setTimeout(()=>confetti.classList.remove("show"), 3200);
+  }
+
+  startBtn.addEventListener("click", () => startGame(LIMIT));
+  demoBtn.addEventListener("click", () => startGame(5));
+
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+  const loveMsg = document.getElementById("loveMsg");
+  const finalBtns = document.getElementById("finalBtns");
+
+  yesBtn.addEventListener("click", () => {
+    doConfetti();
+    finalBtns.style.display = "none";
+    loveMsg.classList.add("show");
+    loveMsg.innerHTML = `
+      <div class="big">YESSS! 🥹💞</div>
+      <div style="margin-top:6px; line-height:1.55">
+        Adesso parte il contratto: <b>10 baci da 10 secondi</b> (minimo) + <b>2 abbracci</b> + <b>tanti piripiri</b>. Firmi? 😘
+      </div>
+    `;
+  });
+
+  const bubble = document.getElementById("bubble");
+
+  function placeBubbleNearButton(){
+    const r = noBtn.getBoundingClientRect();
+    const centerX = r.left + r.width / 2;
+    const topY = r.top - 10;
+
+    const x = Math.min(window.innerWidth - 12, Math.max(12, centerX));
+    const y = Math.min(window.innerHeight - 12, Math.max(12, topY));
+
+    bubble.style.left = x + "px";
+    bubble.style.top  = y + "px";
+    bubble.style.transform = "translate(-50%, -100%)";
+  }
+
+  function showBubble(){
+    placeBubbleNearButton();
+    bubble.classList.add("show");
+    clearTimeout(showBubble._t);
+    showBubble._t = setTimeout(()=>bubble.classList.remove("show"), 1100);
+  }
+
+  function moveNo(){
+    const pad = 14;
+
+    noBtn.style.position = "fixed";
+    noBtn.style.zIndex = "9999";
+
+    const rect = noBtn.getBoundingClientRect();
+    const maxX = window.innerWidth  - rect.width  - pad;
+    const maxY = window.innerHeight - rect.height - pad;
+
+    const x = Math.random() * Math.max(1, maxX) + pad;
+    const y = Math.random() * Math.max(1, maxY) + pad;
+
+    noBtn.style.left = x + "px";
+    noBtn.style.top  = y + "px";
+
+    showBubble();
+  }
+
+    let noCount = 0;
+
+  // ---- Anti "tap fantasma" su mobile ----
+  let suppressClicksUntil = 0;
+  document.addEventListener("click", (e) => {
+    if (Date.now() < suppressClicksUntil) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    }
+  }, true); // capture = true
+
+  function armSuppressClicks(ms = 350){
+    suppressClicksUntil = Date.now() + ms;
+  }
+
+  // (opzionale) su desktop continua a scappare anche al passaggio del mouse
+  noBtn.addEventListener("pointerenter", (e) => {
+    // solo se c'è davvero hover (desktop)
+    if (window.matchMedia && window.matchMedia("(hover: hover)").matches) {
+      noCount++;
+      if (noCount <= 6) {
+        armSuppressClicks(200);
+        moveNo();
+      }
+    }
+  });
+
+  // Su mobile: gestiamo tutto su pointerdown (tap)
+  noBtn.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // cattura il puntatore così l'evento resta "suo"
+    try { noBtn.setPointerCapture(e.pointerId); } catch {}
+
+    noCount++;
+
+    if(noCount <= 10){
+      armSuppressClicks(400);   // blocca il click che potrebbe finire su "Sì"
+      moveNo();
+      return;
+    }
+
+    // dopo un po' si arrende e diventa "Sì"
+    noBtn.textContent = "Ok ok… Sì 💗";
+    noBtn.classList.remove("ghost");
+    noBtn.classList.add("primary");
+    noBtn.style.position = "static";
+    noBtn.style.left = "";
+    noBtn.style.top = "";
+    bubble.classList.remove("show");
+
+    // IMPORTANTISSIMO: niente click fantasma
+    armSuppressClicks(400);
+
+    // quando ormai è "Sì", cliccandolo attiva il sì vero
+    noBtn.onclick = null;
+    noBtn.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      yesBtn.click();
+    }, { once:true });
+  }, { passive:false });
+
+
+  window.addEventListener("resize", () => {
+    if (bubble.classList.contains("show")) placeBubbleNearButton();
+  });
 </script>
 </body>
 </html>
